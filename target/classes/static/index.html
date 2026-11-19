@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Management System | Spring Boot & MySQL</title>
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-hover: #4338CA;
+      --primary-light: #EEF2FF;
+      --primary-dark: #3730A3;
+      --sidebar-bg: #0F172A;
+      --sidebar-hover: #1E293B;
+      --sidebar-active: #312E81;
+      --sidebar-text: #94A3B8;
+      --sidebar-text-active: #FFFFFF;
+      --bg-main: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --border-focus: #818CF8;
+      --success: #16A34A;
+      --success-light: #DCFCE7;
+      --warning: #D97706;
+      --warning-light: #FEF3C7;
+      --danger: #DC2626;
+      --danger-light: #FEE2E2;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================================================
+       SIDEBAR
+       ========================================================================== */
+    .sidebar {
+      width: 260px;
+      background-color: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-right: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .sidebar-logo {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--primary), #818CF8);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
+    }
+
+    .sidebar-brand h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.2px;
+    }
+
+    .sidebar-brand p {
+      font-size: 11px;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #64748B;
+      padding: 10px 12px 4px;
+      letter-spacing: 0.8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      color: var(--sidebar-text);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .nav-item:hover {
+      background-color: var(--sidebar-hover);
+      color: #FFFFFF;
+    }
+
+    .nav-item.active {
+      background-color: var(--sidebar-active);
+      color: var(--sidebar-text-active);
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid #1e293b;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .sys-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #1e293b;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 11.5px;
+      color: #CBD5E1;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* ==========================================================================
+       MAIN CONTENT AREA
+       ========================================================================== */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background-color: var(--bg-main);
+    }
+
+    /* Header */
+    .top-header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .header-title h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.3px;
+    }
+
+    .header-title p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      box-shadow: 0 4px 8px rgba(79, 70, 229, 0.35);
+    }
+
+    .btn-secondary {
+      background-color: #FFFFFF;
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background-color: #F1F5F9;
+      border-color: #CBD5E1;
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: #FFFFFF;
+    }
+
+    .btn-danger:hover {
+      background-color: #B91C1C;
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    .btn-icon {
+      padding: 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Content Area */
+    .content-body {
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ==========================================================================
+       STATS CARDS
+       ========================================================================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .stat-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stat-icon.indigo { background-color: #EEF2FF; color: var(--primary); }
+    .stat-icon.emerald { background-color: var(--success-light); color: var(--success); }
+    .stat-icon.amber { background-color: var(--warning-light); color: var(--warning); }
+    .stat-icon.rose { background-color: #FFE4E6; color: #E11D48; }
+
+    .stat-info h3 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+
+    .stat-info p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    /* ==========================================================================
+       MAIN DATA CARD & TABLE
+       ========================================================================== */
+    .data-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .data-card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: #FAFAFA;
+    }
+
+    .table-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-title h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .badge-count {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .table-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-box input {
+      padding: 8px 12px 8px 34px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      background-color: #FFFFFF;
+      width: 240px;
+      transition: all 0.2s;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+      width: 280px;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 10px;
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      background-color: #FFFFFF;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--border-focus);
+    }
+
+    /* Table Styles */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    thead th {
+      background-color: #F8FAFC;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background-color: #F8FAFC;
+    }
+
+    .book-title-cell {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .book-title {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .book-author {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .id-tag {
+      display: inline-block;
+      font-family: monospace;
+      font-size: 11.5px;
+      background-color: #F1F5F9;
+      color: #475569;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background-color: #F1F5F9;
+      color: #334155;
+    }
+
+    .stock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .stock-in {
+      background-color: var(--success-light);
+      color: #15803D;
+    }
+
+    .stock-low {
+      background-color: var(--warning-light);
+      color: #B45309;
+    }
+
+    .stock-out {
+      background-color: var(--danger-light);
+      color: #B91C1C;
+    }
+
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-action {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 8px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-action:hover {
+      background-color: #F1F5F9;
+      color: var(--text-main);
+    }
+
+    .btn-action.edit:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .btn-action.delete:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      background-color: var(--danger-light);
+    }
+
+    .btn-action.raw:hover {
+      border-color: #8B5CF6;
+      color: #8B5CF6;
+      background-color: #F5F3FF;
+    }
+
+    /* States: Empty, Loading, Error */
+    .state-container {
+      padding: 60px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .state-container svg {
+      width: 48px;
+      height: 48px;
+      color: #94A3B8;
+    }
+
+    .state-container h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .state-container p {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 400px;
+    }
+
+    /* ==========================================================================
+       MODAL DIALOGS
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background-color: #FFFFFF;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 520px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform: scale(0.95);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-overlay.open .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background-color: #F1F5F9;
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .form-group label span.req {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .form-control {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      background-color: #FFFFFF;
+      transition: all 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .category-chip {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: #F1F5F9;
+      color: #475569;
+      cursor: pointer;
+      border: 1px solid #E2E8F0;
+      transition: all 0.15s;
+    }
+
+    .category-chip:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--border-focus);
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background-color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Viva Inspector Modal */
+    .raw-inspector-box {
+      background: #0F172A;
+      color: #38BDF8;
+      font-family: "Consolas", monospace;
+      font-size: 12px;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    .viva-box {
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-size: 13px;
+      color: #166534;
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       TOAST NOTIFICATIONS
+       ========================================================================== */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      min-width: 300px;
+      max-width: 420px;
+      background-color: #FFFFFF;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border-left: 4px solid var(--primary);
+      animation: slideIn 0.3s ease forwards;
+      transition: all 0.2s ease;
+    }
+
+    .toast.toast-success { border-left-color: var(--success); }
+    .toast.toast-danger { border-left-color: var(--danger); }
+    .toast.toast-warning { border-left-color: var(--warning); }
+
+    .toast-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .toast-success .toast-icon { color: var(--success); }
+    .toast-danger .toast-icon { color: var(--danger); }
+    .toast-warning .toast-icon { color: var(--warning); }
+
+    .toast-content h5 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .toast-content p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+
+    /* ==========================================================================
+       RESPONSIVENESS
+       ========================================================================== */
+    @media (max-width: 900px) {
+      .sidebar {
+        position: fixed;
+        left: -260px;
+      }
+      .sidebar.open {
+        transform: translateX(260px);
+      }
+      .top-header {
+        padding: 16px;
+      }
+      .content-body {
+        padding: 20px 16px;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       SIDEBAR
+       ======================================================================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      </div>
+      <div class="sidebar-brand">
+        <h1>KIET Library</h1>
+        <p>Spring Boot Admin</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-label">Navigation</div>
+      <a class="nav-item active" id="nav-dashboard" onclick="switchSection('dashboard')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" id="nav-add" onclick="openAddModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Add New Book</span>
+      </a>
+
+      <div class="nav-label" style="margin-top: 14px;">Lab Exam Demonstrations</div>
+      <a class="nav-item" onclick="openPrototypeModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        </svg>
+        <span>Prototype Scope Bean</span>
+      </a>
+      <a class="nav-item" onclick="openVivaModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span>Viva Q&A Cheat Sheet</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sys-pill">
+        <div class="status-dot"></div>
+        <div>
+          <div style="font-weight: 600; color: #FFFFFF;">MySQL Connected</div>
+          <div style="color: #94A3B8; font-size: 10px;">Spring Boot 4.x / Port 8080</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========================================================================
+       MAIN WRAPPER
+       ======================================================================== -->
+  <div class="main-wrapper">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-title">
+        <h2>Book Records Dashboard</h2>
+        <p>Spring Boot REST API &bull; Spring JDBC (JdbcTemplate) &bull; MySQL Database</p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-secondary btn-sm" onclick="fetchBooks()" title="Refresh database records">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>Refresh</span>
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Add Book</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Body -->
+    <main class="content-body">
+      <!-- Stats Grid -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon indigo">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-total-books">0</h3>
+            <p>Total Book Titles</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon emerald">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-total-copies">0</h3>
+            <p>Available Copies</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon amber">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-categories">0</h3>
+            <p>Active Categories</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon rose">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-low-stock">0</h3>
+            <p>Low / Out of Stock</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Data Table Card -->
+      <section class="data-card">
+        <div class="data-card-header">
+          <div class="table-title">
+            <h3>Library Catalog</h3>
+            <span class="badge-count" id="table-count-badge">0 Books</span>
+          </div>
+
+          <div class="table-controls">
+            <!-- Search Input -->
+            <div class="search-box">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input type="text" id="search-input" placeholder="Search by title, author, category..." oninput="handleSearch()">
+            </div>
+
+            <!-- Category Filter Dropdown -->
+            <select class="filter-select" id="category-filter" onchange="handleCategoryFilter()">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Dynamic Table Container -->
+        <div class="table-container">
+          <table id="books-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">ID</th>
+                <th>Title & Author</th>
+                <th>Category</th>
+                <th style="width: 150px;">Available Copies</th>
+                <th style="width: 150px; text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="books-table-body">
+              <!-- Dynamically populated via Vanilla JS -->
+            </tbody>
+          </table>
+
+          <!-- Empty State -->
+          <div id="empty-state" class="state-container" style="display: none;">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <h4>No Books Found</h4>
+            <p>The library catalog is currently empty or no records matched your search query.</p>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal()">Add Your First Book</button>
+          </div>
+
+          <!-- Loading State -->
+          <div id="loading-state" class="state-container">
+            <svg class="spin" style="animation: spin 1s linear infinite;" width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <p>Loading records from MySQL database...</p>
+          </div>
+
+          <!-- Error State -->
+          <div id="error-state" class="state-container" style="display: none;">
+            <svg style="color: var(--danger);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h4>Failed to Connect to Server</h4>
+            <p id="error-message">Could not fetch books from REST API. Please ensure Spring Boot is running on port 8080.</p>
+            <button class="btn btn-secondary btn-sm" onclick="fetchBooks()">Retry Connection</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: ADD / EDIT BOOK
+       ======================================================================== -->
+  <div class="modal-overlay" id="book-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Add New Book</h3>
+        <button class="modal-close" onclick="closeBookModal()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="book-form" onsubmit="handleFormSubmit(event)">
+        <input type="hidden" id="form-book-id">
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="form-title">Book Title <span class="req">*</span></label>
+            <input type="text" id="form-title" class="form-control" placeholder="e.g., Clean Code: A Handbook of Agile Software" required>
+          </div>
+
+          <div class="form-group">
+            <label for="form-author">Author Name <span class="req">*</span></label>
+            <input type="text" id="form-author" class="form-control" placeholder="e.g., Robert C. Martin" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-category">Category <span class="req">*</span></label>
+              <input type="text" id="form-category" class="form-control" placeholder="e.g., Software Engineering" required>
+              <div class="category-chips">
+                <span class="category-chip" onclick="setCategory('Computer Science')">CS</span>
+                <span class="category-chip" onclick="setCategory('Software Engineering')">Software Eng</span>
+                <span class="category-chip" onclick="setCategory('Programming')">Programming</span>
+                <span class="category-chip" onclick="setCategory('Database Systems')">DBMS</span>
+                <span class="category-chip" onclick="setCategory('Artificial Intelligence')">AI/ML</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="form-copies">Available Copies <span class="req">*</span></label>
+              <input type="number" id="form-copies" class="form-control" min="0" placeholder="e.g., 5" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeBookModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-form">
+            <span id="btn-submit-text">Save Book</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: DELETE CONFIRMATION
+       ======================================================================== -->
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3>Confirm Deletion</h3>
+        <button class="modal-close" onclick="closeDeleteModal()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14px; color: var(--text-main);">
+          Are you sure you want to delete book <strong id="delete-book-title" style="color: var(--danger);"></strong> (ID: <span id="delete-book-id" class="id-tag"></span>)?
+        </p>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-top: 6px;">
+          This action will permanently remove the record from the MySQL database using a Spring JDBC DELETE statement.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-delete" onclick="executeDelete()">Delete Permanently</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: RAW JDBC DEMONSTRATION INSPECTOR
+       ======================================================================== -->
+  <div class="modal-overlay" id="raw-modal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>Raw JDBC Verification Tool</h3>
+        <button class="modal-close" onclick="closeRawModal()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="viva-box">
+          <strong>Academic Syllabus Verification:</strong><br>
+          This test triggers the DAO method <code>findByIdRawJdbc(id)</code> which executes raw Java JDBC using 
+          <code>Class.forName("com.mysql.cj.jdbc.Driver")</code>, 
+          <code>DriverManager.getConnection()</code>, and <code>PreparedStatement</code> directly without Spring JdbcTemplate.
+        </div>
+
+        <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Raw Database Output</div>
+        <div class="raw-inspector-box" id="raw-output">Executing query...</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeRawModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: PROTOTYPE BEAN SCOPE DEMONSTRATION
+       ======================================================================== -->
+  <div class="modal-overlay" id="prototype-modal">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3>Spring Prototype Scope Demonstration</h3>
+        <button class="modal-close" onclick="closePrototypeModal()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="viva-box">
+          <strong>Singleton vs Prototype Scope:</strong><br>
+          - <em>Singleton (Default):</em> Spring creates a single shared instance for the whole container.<br>
+          - <em>Prototype (@Scope("prototype")):</em> Spring creates a brand new instance every time the bean is requested.
+        </div>
+
+        <button class="btn btn-primary btn-sm" onclick="fetchPrototypeDemo()">Request Fresh Prototype Instances</button>
+
+        <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 10px;">Live Server Response</div>
+        <div class="raw-inspector-box" id="prototype-output">Click button above to test...</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closePrototypeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: VIVA Q&A CHEAT SHEET
+       ======================================================================== -->
+  <div class="modal-overlay" id="viva-modal">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3>Viva Quick-Reference Cheat Sheet</h3>
+        <button class="modal-close" onclick="closeVivaModal()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="font-size: 13px; line-height: 1.6;">
+        <p><strong>1. What is MVC Architecture?</strong><br>
+        Model (Book POJO), View (HTML5/CSS3/JS UI), Controller (BookController REST API). Business logic resides in Service, and persistence resides in DAO.</p>
+        <hr style="border: none; border-top: 1px solid var(--border);">
+
+        <p><strong>2. JdbcTemplate vs Raw JDBC?</strong><br>
+        Raw JDBC requires manual driver loading, connection opening/closing, and catching SQLExceptions. Spring's JdbcTemplate eliminates boilerplate and translates SQLExceptions into unchecked Spring DataAccessExceptions.</p>
+        <hr style="border: none; border-top: 1px solid var(--border);">
+
+        <p><strong>3. Constructor Injection vs Field Injection?</strong><br>
+        Constructor injection (used across this project) ensures immutability (final fields) and safe unit testing. Field injection (@Autowired on fields) uses reflection directly.</p>
+        <hr style="border: none; border-top: 1px solid var(--border);">
+
+        <p><strong>4. What is AOP?</strong><br>
+        Aspect-Oriented Programming isolates cross-cutting concerns (logging, security) using Aspects, JoinPoints, Pointcuts, and Advices (@Before, @After).</p>
+        <hr style="border: none; border-top: 1px solid var(--border);">
+
+        <p><strong>5. Bean Lifecycle Callbacks?</strong><br>
+        @PostConstruct runs right after dependencies are injected; @PreDestroy runs right before container shuts down.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeVivaModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ========================================================================
+       VANILLA JAVASCRIPT LOGIC (Fetch API + DOM Manipulation)
+       ======================================================================== -->
+  <script>
+    // Base URL for the Spring Boot REST API
+    const API_BASE_URL = '/api/books';
+
+    // Global in-memory book state
+    let allBooks = [];
+    let deleteTargetId = null;
+
+    // Initialize application on DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchBooks();
+    });
+
+    /**
+     * FETCH ALL BOOKS:
+     * Calls GET /api/books using the Fetch API.
+     */
+    async function fetchBooks() {
+      showLoading(true);
+      hideError();
+
+      try {
+        const response = await fetch(API_BASE_URL);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        allBooks = await response.json();
+        renderTable(allBooks);
+        calculateStats(allBooks);
+        populateCategoryFilter(allBooks);
+      } catch (error) {
+        console.error('Fetch error:', error);
+        showError('Could not connect to Spring Boot REST API: ' + error.message);
+        showToast('Connection Error', 'Backend service unreachable on port 8080.', 'danger');
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    /**
+     * RENDER DATA TABLE:
+     * Safely constructs HTML rows using textContent to prevent XSS.
+     */
+    function renderTable(books) {
+      const tbody = document.getElementById('books-table-body');
+      const emptyState = document.getElementById('empty-state');
+      const countBadge = document.getElementById('table-count-badge');
+
+      tbody.innerHTML = '';
+      countBadge.textContent = `${books.length} Books`;
+
+      if (books.length === 0) {
+        emptyState.style.display = 'flex';
+        return;
+      } else {
+        emptyState.style.display = 'none';
+      }
+
+      books.forEach(book => {
+        const tr = document.createElement('tr');
+
+        // Column 1: ID
+        const tdId = document.createElement('td');
+        const idSpan = document.createElement('span');
+        idSpan.className = 'id-tag';
+        idSpan.textContent = `#${book.id}`;
+        tdId.appendChild(idSpan);
+        tr.appendChild(tdId);
+
+        // Column 2: Title & Author
+        const tdTitle = document.createElement('td');
+        const titleCell = document.createElement('div');
+        titleCell.className = 'book-title-cell';
+
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'book-title';
+        titleSpan.textContent = book.title;
+
+        const authorSpan = document.createElement('span');
+        authorSpan.className = 'book-author';
+        authorSpan.textContent = `by ${book.author}`;
+
+        titleCell.appendChild(titleSpan);
+        titleCell.appendChild(authorSpan);
+        tdTitle.appendChild(titleCell);
+        tr.appendChild(tdTitle);
+
+        // Column 3: Category
+        const tdCategory = document.createElement('td');
+        const catBadge = document.createElement('span');
+        catBadge.className = 'category-badge';
+        catBadge.textContent = book.category;
+        tdCategory.appendChild(catBadge);
+        tr.appendChild(tdCategory);
+
+        // Column 4: Available Copies & Status
+        const tdCopies = document.createElement('td');
+        const stockBadge = document.createElement('span');
+        const copies = book.availableCopies || 0;
+
+        if (copies === 0) {
+          stockBadge.className = 'stock-badge stock-out';
+          stockBadge.textContent = 'Out of Stock (0)';
+        } else if (copies <= 2) {
+          stockBadge.className = 'stock-badge stock-low';
+          stockBadge.textContent = `Low Stock (${copies})`;
+        } else {
+          stockBadge.className = 'stock-badge stock-in';
+          stockBadge.textContent = `${copies} Available`;
+        }
+        tdCopies.appendChild(stockBadge);
+        tr.appendChild(tdCopies);
+
+        // Column 5: Action Buttons (Edit, Delete, Raw JDBC)
+        const tdActions = document.createElement('td');
+        tdActions.style.textAlign = 'right';
+
+        const actionGroup = document.createElement('div');
+        actionGroup.className = 'action-group';
+        actionGroup.style.justifyContent = 'flex-end';
+
+        // Raw JDBC Inspect Button
+        const btnRaw = document.createElement('button');
+        btnRaw.className = 'btn-action raw';
+        btnRaw.title = 'Verify via Raw JDBC';
+        btnRaw.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>`;
+        btnRaw.onclick = () => inspectRawJdbc(book.id);
+
+        // Edit Button
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn-action edit';
+        btnEdit.title = 'Edit Book';
+        btnEdit.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>`;
+        btnEdit.onclick = () => openEditModal(book);
+
+        // Delete Button
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn-action delete';
+        btnDelete.title = 'Delete Book';
+        btnDelete.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+        btnDelete.onclick = () => openDeleteModal(book);
+
+        actionGroup.appendChild(btnRaw);
+        actionGroup.appendChild(btnEdit);
+        actionGroup.appendChild(btnDelete);
+        tdActions.appendChild(actionGroup);
+        tr.appendChild(tdActions);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    /**
+     * STATS CALCULATION:
+     * Dynamically calculates metrics from actual database records.
+     */
+    function calculateStats(books) {
+      document.getElementById('stat-total-books').textContent = books.length;
+
+      const totalCopies = books.reduce((sum, b) => sum + (Number(b.availableCopies) || 0), 0);
+      document.getElementById('stat-total-copies').textContent = totalCopies;
+
+      const uniqueCategories = new Set(books.map(b => b.category?.trim().toLowerCase()).filter(Boolean));
+      document.getElementById('stat-categories').textContent = uniqueCategories.size;
+
+      const lowStockCount = books.filter(b => (Number(b.availableCopies) || 0) <= 2).length;
+      document.getElementById('stat-low-stock').textContent = lowStockCount;
+    }
+
+    /**
+     * SEARCH & FILTER LOGIC:
+     */
+    function handleSearch() {
+      applyFilters();
+    }
+
+    function handleCategoryFilter() {
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      const selectedCategory = document.getElementById('category-filter').value;
+
+      const filtered = allBooks.filter(book => {
+        const matchesQuery = !query || 
+          book.title?.toLowerCase().includes(query) ||
+          book.author?.toLowerCase().includes(query) ||
+          book.category?.toLowerCase().includes(query) ||
+          String(book.id).includes(query);
+
+        const matchesCategory = !selectedCategory || book.category === selectedCategory;
+
+        return matchesQuery && matchesCategory;
+      });
+
+      renderTable(filtered);
+    }
+
+    function populateCategoryFilter(books) {
+      const select = document.getElementById('category-filter');
+      const currentVal = select.value;
+      const categories = [...new Set(books.map(b => b.category).filter(Boolean))].sort();
+
+      select.innerHTML = '<option value="">All Categories</option>';
+      categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        if (cat === currentVal) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    /**
+     * FORM SUBMIT: CREATE OR UPDATE
+     */
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+
+      const id = document.getElementById('form-book-id').value;
+      const title = document.getElementById('form-title').value.trim();
+      const author = document.getElementById('form-author').value.trim();
+      const category = document.getElementById('form-category').value.trim();
+      const availableCopies = parseInt(document.getElementById('form-copies').value, 10);
+
+      const payload = { title, author, category, availableCopies };
+      const isEdit = Boolean(id);
+      const url = isEdit ? `${API_BASE_URL}/${encodeURIComponent(id)}` : API_BASE_URL;
+      const method = isEdit ? 'PUT' : 'POST';
+
+      const submitBtn = document.getElementById('btn-submit-form');
+      submitBtn.disabled = true;
+      document.getElementById('btn-submit-text').textContent = 'Saving...';
+
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showToast('Success', result.message || 'Book saved successfully!', 'success');
+          closeBookModal();
+          fetchBooks();
+        } else {
+          showToast('Validation Error', result.message || 'Failed to save book.', 'warning');
+        }
+      } catch (error) {
+        showToast('Error', 'Server request failed: ' + error.message, 'danger');
+      } finally {
+        submitBtn.disabled = false;
+        document.getElementById('btn-submit-text').textContent = 'Save Book';
+      }
+    }
+
+    /**
+     * DELETE RECORD:
+     */
+    function openDeleteModal(book) {
+      deleteTargetId = book.id;
+      document.getElementById('delete-book-id').textContent = book.id;
+      document.getElementById('delete-book-title').textContent = `"${book.title}"`;
+      document.getElementById('delete-modal').classList.add('open');
+    }
+
+    function closeDeleteModal() {
+      deleteTargetId = null;
+      document.getElementById('delete-modal').classList.remove('open');
+    }
+
+    async function executeDelete() {
+      if (!deleteTargetId) return;
+
+      const deleteBtn = document.getElementById('btn-confirm-delete');
+      deleteBtn.disabled = true;
+      deleteBtn.textContent = 'Deleting...';
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/${encodeURIComponent(deleteTargetId)}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showToast('Deleted', result.message || 'Book removed from library.', 'success');
+          closeDeleteModal();
+          fetchBooks();
+        } else {
+          showToast('Delete Failed', result.message || 'Book not found.', 'danger');
+        }
+      } catch (error) {
+        showToast('Error', 'Delete request failed: ' + error.message, 'danger');
+      } finally {
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = 'Delete Permanently';
+      }
+    }
+
+    /**
+     * RAW JDBC INSPECTOR:
+     */
+    async function inspectRawJdbc(id) {
+      document.getElementById('raw-output').textContent = `Executing raw JDBC query for Book ID: ${id}...`;
+      document.getElementById('raw-modal').classList.add('open');
+
+      const startTime = performance.now();
+      try {
+        const response = await fetch(`${API_BASE_URL}/raw/${encodeURIComponent(id)}`);
+        const data = await response.json();
+        const duration = (performance.now() - startTime).toFixed(2);
+
+        document.getElementById('raw-output').textContent = 
+          `// --- RAW JDBC EXECUTION TRACE ---\n` +
+          `Execution Time: ${duration} ms\n` +
+          `Driver: com.mysql.cj.jdbc.Driver\n` +
+          `SQL: SELECT id, title, author, category, available_copies FROM books WHERE id = ?\n\n` +
+          `Result:\n` + JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('raw-output').textContent = `Raw JDBC execution error: ${err.message}`;
+      }
+    }
+
+    function closeRawModal() {
+      document.getElementById('raw-modal').classList.remove('open');
+    }
+
+    /**
+     * PROTOTYPE SCOPE INSPECTION:
+     */
+    async function fetchPrototypeDemo() {
+      document.getElementById('prototype-output').textContent = 'Requesting prototype instances from Spring IoC Container...';
+      try {
+        const response = await fetch(`${API_BASE_URL}/prototype-demo`);
+        const data = await response.json();
+        document.getElementById('prototype-output').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('prototype-output').textContent = 'Error: ' + err.message;
+      }
+    }
+
+    function openPrototypeModal() {
+      document.getElementById('prototype-modal').classList.add('open');
+      fetchPrototypeDemo();
+    }
+
+    function closePrototypeModal() {
+      document.getElementById('prototype-modal').classList.remove('open');
+    }
+
+    /**
+     * VIVA MODAL:
+     */
+    function openVivaModal() {
+      document.getElementById('viva-modal').classList.add('open');
+    }
+
+    function closeVivaModal() {
+      document.getElementById('viva-modal').classList.remove('open');
+    }
+
+    /**
+     * MODAL HELPERS:
+     */
+    function openAddModal() {
+      document.getElementById('book-form').reset();
+      document.getElementById('form-book-id').value = '';
+      document.getElementById('modal-title').textContent = 'Add New Book';
+      document.getElementById('btn-submit-text').textContent = 'Create Book';
+      document.getElementById('book-modal').classList.add('open');
+    }
+
+    function openEditModal(book) {
+      document.getElementById('form-book-id').value = book.id;
+      document.getElementById('form-title').value = book.title;
+      document.getElementById('form-author').value = book.author;
+      document.getElementById('form-category').value = book.category;
+      document.getElementById('form-copies').value = book.availableCopies;
+      document.getElementById('modal-title').textContent = `Edit Book #${book.id}`;
+      document.getElementById('btn-submit-text').textContent = 'Update Book';
+      document.getElementById('book-modal').classList.add('open');
+    }
+
+    function closeBookModal() {
+      document.getElementById('book-modal').classList.remove('open');
+    }
+
+    function setCategory(cat) {
+      document.getElementById('form-category').value = cat;
+    }
+
+    /**
+     * UI STATE HELPERS:
+     */
+    function showLoading(show) {
+      document.getElementById('loading-state').style.display = show ? 'flex' : 'none';
+      if (show) {
+        document.getElementById('empty-state').style.display = 'none';
+        document.getElementById('books-table').style.display = 'none';
+      } else {
+        document.getElementById('books-table').style.display = 'table';
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('error-message').textContent = msg;
+      document.getElementById('error-state').style.display = 'flex';
+      document.getElementById('books-table').style.display = 'none';
+    }
+
+    function hideError() {
+      document.getElementById('error-state').style.display = 'none';
+    }
+
+    /**
+     * TOAST NOTIFICATIONS:
+     */
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+
+      let iconSvg = '';
+      if (type === 'success') {
+        iconSvg = `<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+      } else if (type === 'danger') {
+        iconSvg = `<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+      } else {
+        iconSvg = `<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+      }
+
+      toast.innerHTML = `
+        <div class="toast-icon">${iconSvg}</div>
+        <div class="toast-content">
+          <h5>${escapeHtml(title)}</h5>
+          <p>${escapeHtml(message)}</p>
+        </div>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

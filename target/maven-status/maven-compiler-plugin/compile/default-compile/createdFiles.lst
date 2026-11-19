@@ -1,0 +1,8 @@
+com\kiet\examproject\ExamprojectApplication.class
+com\kiet\examproject\service\BookService.class
+com\kiet\examproject\controller\BookController.class
+com\kiet\examproject\config\AppConfig$BookAuditHelper.class
+com\kiet\examproject\config\AppConfig.class
+com\kiet\examproject\dao\BookDao.class
+com\kiet\examproject\aspect\LoggingAspect.class
+com\kiet\examproject\model\Book.class
